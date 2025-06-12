@@ -9,9 +9,10 @@ app = Flask(__name__)
 
 #Configure MySQL
 conn = pymysql.connect(host='localhost',
+											 port = 3306,
                        user='root',
                        password='',
-                       db='blog',
+                       db='Project',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -50,6 +51,7 @@ def loginAuth():
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
+
 	error = None
 	if(data):
 		#creates a session for the the user
@@ -77,6 +79,7 @@ def registerAuth():
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
+
 	error = None
 	if(data):
 		#If the previous query returns data, then user exists
@@ -92,27 +95,30 @@ def registerAuth():
 
 @app.route('/home')
 def home():
-    
     username = session['username']
-    cursor = conn.cursor();
+
+    cursor = conn.cursor()
     query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
     cursor.execute(query, (username))
     data1 = cursor.fetchall() 
-    for each in data1:
-        print(each['blog_post'])
     cursor.close()
+
+    # for each in data1:
+    #     print(each['blog_post'])
     return render_template('home.html', username=username, posts=data1)
 
 		
 @app.route('/post', methods=['GET', 'POST'])
 def post():
 	username = session['username']
-	cursor = conn.cursor();
+
+	cursor = conn.cursor()
 	blog = request.form['blog']
 	query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
 	cursor.execute(query, (blog, username))
 	conn.commit()
 	cursor.close()
+	
 	return redirect(url_for('home'))
 
 

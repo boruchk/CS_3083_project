@@ -2,12 +2,12 @@ CREATE TABLE Customer(
 	email VARCHAR(255),
 	name VARCHAR(255),
 	password VARCHAR(255),
-	bldg_number INT,
+	bldg_number VARCHAR(255),
 	street_name VARCHAR(255),
 	city VARCHAR(255),
 	state VARCHAR(255),
 	phone_number VARCHAR(10),
-	passport_number INT,
+	passport_number VARCHAR(255),
 	passport_exp DATE,
 	passport_country VARCHAR(255),
 	date_of_birth DATE,
@@ -31,12 +31,12 @@ CREATE TABLE Airport (
 );
 
 CREATE TABLE Airplane (
-	ID INT AUTO_INCREMENT,
+	airline_name VARCHAR(255),
+	ID VARCHAR(255),
 	seat_count INT,
 	manufacturer VARCHAR(255),
 	manufacture_date DATE,
-	airline_name VARCHAR(255),
-	PRIMARY KEY (ID),
+	PRIMARY KEY (airline_name, ID),
 	FOREIGN KEY (airline_name) REFERENCES Airline(name)
 );
 
@@ -60,9 +60,9 @@ CREATE TABLE Phone_Number(
 );
 
 CREATE TABLE Flight(
-  flight_number INT,
-  departure_datetime DATETIME,
   airline_name VARCHAR(255),
+  flight_number VARCHAR(255),
+  departure_datetime DATETIME,
   departure_airport_name VARCHAR(255),
   arrival_datetime DATETIME,
   arrival_airport_name VARCHAR(255),
@@ -71,10 +71,9 @@ CREATE TABLE Flight(
   remaining_seats INT,
   status VARCHAR(255),
   PRIMARY KEY (flight_number, departure_datetime, airline_name),
-  FOREIGN KEY (airline_name) REFERENCES Airline(name),
   FOREIGN KEY (departure_airport_name) REFERENCES Airport(name),
   FOREIGN KEY (arrival_airport_name) REFERENCES Airport(name),
-  FOREIGN KEY (airplane_id) REFERENCES Airplane(ID)
+  FOREIGN KEY (airline_name, airplane_id) REFERENCES Airplane(airline_name, ID)
 );
 
 CREATE TABLE Ticket(

@@ -17,10 +17,54 @@ conn = pymysql.connect(host='localhost',
                        cursorclass=pymysql.cursors.DictCursor)
 
 
-#Define a route to hello function
-@app.route('/')
-def hello():
-	return render_template('index.html')
+#Define a route to landingPage function
+@app.route('/',methods=['GET', 'POST'])
+def landingPage():
+	departureDate = request.args.get('departureDate')
+	departureAirport = request.args.get('departureAirports')
+	arrivalAirport = request.args.get('arrivalAirports')
+
+	cursor = conn.cursor()
+	cityQuery = 'SELECT DISTINCT city FROM Airport'
+	airportQuery = 'SELECT name FROM Airport'
+	departureFlightQuery = 'SELECT * ' \
+		'FROM Flight ' \
+		'WHERE departure_datetime = %s and ' \
+			'departure_airport_name = %s and ' \
+			'arrival_datetime >= %s and ' \
+			'arrival_airport_name = %s'
+		
+	cursor.execute(cityQuery)
+	departureCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	departureAirports = cursor.fetchall()
+	cursor.execute(cityQuery)
+	arrivalCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	arrivalAirports = cursor.fetchall()
+	
+	departureFlights = []
+	print(departureAirport)
+	print(arrivalAirport)
+	error = None
+	if departureDate and departureAirport and arrivalAirport:
+		cursor.execute(departureFlightQuery, (departureDate, 
+																				departureAirport, 
+																				departureDate, 
+																				arrivalAirport))
+		departureFlights = cursor.fetchall()
+		if not departureFlights:
+			error = 'No flights for those choices'
+
+	cursor.close()
+
+	return render_template('index.html', 
+												departureCities=departureCities,
+												departureAirports=departureAirports,
+												arrivalCities=arrivalCities,
+												arrivalAirports=arrivalAirports,
+												departureFlights=departureFlights,
+												error=error)
 
 
 #Define route for login

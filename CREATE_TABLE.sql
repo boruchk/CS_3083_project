@@ -22,7 +22,7 @@ CREATE TABLE Airline(
   PRIMARY KEY (name)
 );
 
-CREATE TABLE Airport (
+CREATE TABLE Airport(
 	name VARCHAR(255),
 	city VARCHAR(255),
 	country VARCHAR(255),
@@ -30,7 +30,7 @@ CREATE TABLE Airport (
 	PRIMARY KEY (name)
 );
 
-CREATE TABLE Airplane (
+CREATE TABLE Airplane(
 	airline_name VARCHAR(255),
 	ID VARCHAR(255),
 	seat_count INT,
@@ -67,10 +67,10 @@ CREATE TABLE Flight(
   arrival_datetime DATETIME,
   arrival_airport_name VARCHAR(255),
   base_price FLOAT(10, 2),
-  airplane_id INT,
+  airplane_id VARCHAR(255),
   remaining_seats INT,
   status VARCHAR(255),
-  PRIMARY KEY (flight_number, departure_datetime, airline_name),
+  PRIMARY KEY (airline_name, flight_number, departure_datetime),
   FOREIGN KEY (departure_airport_name) REFERENCES Airport(name),
   FOREIGN KEY (arrival_airport_name) REFERENCES Airport(name),
   FOREIGN KEY (airline_name, airplane_id) REFERENCES Airplane(airline_name, ID)
@@ -79,9 +79,9 @@ CREATE TABLE Flight(
 CREATE TABLE Ticket(
 	ID INT AUTO_INCREMENT,
 	customer_email VARCHAR(255),
-	flight_number INT,
+	airline_name VARCHAR(255),
+	flight_number VARCHAR(255),
   departure_datetime DATETIME,
-	airline VARCHAR(255),
 	sold_price FLOAT(10, 2),
 	card_type VARCHAR(255),
 	card_number CHAR(19),
@@ -91,8 +91,8 @@ CREATE TABLE Ticket(
 	rating FLOAT(2,1),
 	PRIMARY KEY (ID),
   FOREIGN KEY (customer_email) REFERENCES Customer(email),
-  FOREIGN KEY (flight_number, departure_datetime, airline)
-    REFERENCES Flight(flight_number, departure_datetime, airline_name)
+  FOREIGN KEY (airline_name, flight_number, departure_datetime)
+    REFERENCES Flight(airline_name, flight_number, departure_datetime)
 );
 
 CREATE TABLE User(

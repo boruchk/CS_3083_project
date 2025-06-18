@@ -50,10 +50,33 @@
 	{% if error %}
 		<p class="error"> {{ error }} </p>
 	{% endif %}
-	{% for flight in departureFlights %}
-		<p>{{ flight }}</p>
-		<hr>
-	{% endfor %}
+	<table>
+		<tr>
+			<th>Airline</th>
+			<th>Flight Number</th>
+			<th>Departure Datetime</th>
+			<th>Departure Airport</th>
+			<th>Arrival Datetime</th>
+			<th>Arrival Airport</th>
+			<th>Base Price</th>
+			<th>Seats Remaining</th>
+			<th>Status</th>
+		</tr>
+		{% for flight in departureFlights %}
+			<tr>
+				<td>{{ flight.airline_name }}</td>
+				<td>{{ flight.flight_number }}</td>
+				<td>{{ flight.departure_datetime }}</td>
+				<td>{{ flight.departure_airport_name }}</td>
+				<td>{{ flight.arrival_datetime }}</td>
+				<td>{{ flight.arrival_airport_name }}</td>
+				<td>{{ flight.base_price }}</td>
+				<td>{{ flight.remaining_seats }}</td>
+				<td>{{ flight.status }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+
 
 </body>
 

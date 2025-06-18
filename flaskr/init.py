@@ -29,7 +29,8 @@ def landingPage():
 	airportQuery = 'SELECT name FROM Airport'
 	departureFlightQuery = 'SELECT * ' \
 		'FROM Flight ' \
-		'WHERE departure_datetime = %s and ' \
+		'WHERE departure_datetime >= %s and ' \
+			'departure_datetime < DATE_ADD(%s, INTERVAL 1 DAY) and ' \
 			'departure_airport_name = %s and ' \
 			'arrival_datetime >= %s and ' \
 			'arrival_airport_name = %s'
@@ -44,20 +45,19 @@ def landingPage():
 	arrivalAirports = cursor.fetchall()
 	
 	departureFlights = []
-	print(departureAirport)
-	print(arrivalAirport)
 	error = None
 	if departureDate and departureAirport and arrivalAirport:
 		cursor.execute(departureFlightQuery, (departureDate, 
+																				departureDate,
 																				departureAirport, 
 																				departureDate, 
 																				arrivalAirport))
 		departureFlights = cursor.fetchall()
 		if not departureFlights:
+			print(departureFlights)
 			error = 'No flights for those choices'
 
 	cursor.close()
-
 	return render_template('index.html', 
 												departureCities=departureCities,
 												departureAirports=departureAirports,

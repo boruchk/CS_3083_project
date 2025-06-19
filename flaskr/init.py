@@ -21,13 +21,15 @@ conn = pymysql.connect(host='localhost',
 @app.route('/',methods=['GET', 'POST'])
 def landingPage():
 	departureDate = request.args.get('departureDate')
+	returnDate = request.args.get('returnDate')
+	roundTrip = request.args.get('roundTrip')
 	departureAirport = request.args.get('departureAirports')
 	arrivalAirport = request.args.get('arrivalAirports')
 
 	cursor = conn.cursor()
 	cityQuery = 'SELECT DISTINCT city FROM Airport'
 	airportQuery = 'SELECT name FROM Airport'
-	departureFlightQuery = 'SELECT * ' \
+	flightQuery = 'SELECT * ' \
 		'FROM Flight ' \
 		'WHERE departure_datetime >= %s and ' \
 			'departure_datetime < DATE_ADD(%s, INTERVAL 1 DAY) and ' \
@@ -47,16 +49,26 @@ def landingPage():
 	departureFlights = []
 	error = None
 	if departureDate and departureAirport and arrivalAirport:
-		cursor.execute(departureFlightQuery, (departureDate, 
-																				departureDate,
-																				departureAirport, 
-																				departureDate, 
-																				arrivalAirport))
+		cursor.execute(flightQuery, (departureDate, 
+																	departureDate,
+																	departureAirport, 
+																	departureDate, 
+																	arrivalAirport))
 		departureFlights = cursor.fetchall()
 		if not departureFlights:
-			print(departureFlights)
 			error = 'No flights for those choices'
 
+	returnFlights = []
+	if roundTrip and returnDate and departureAirport and arrivalAirport:
+		cursor.execute(flightQuery, (returnDate, 
+																	returnDate,
+																	arrivalAirport, 
+																	returnDate, 
+																	departureAirport))
+		returnFlights = cursor.fetchall()
+		if not returnFlights:
+			error = 'No return flights for that date'
+	
 	cursor.close()
 	return render_template('index.html', 
 												departureCities=departureCities,
@@ -64,7 +76,31 @@ def landingPage():
 												arrivalCities=arrivalCities,
 												arrivalAirports=arrivalAirports,
 												departureFlights=departureFlights,
+												returnFlights=returnFlights, 
 												error=error)
+
+
+@app.route('/purchase')
+def purchase():
+	error = None
+	if 'username' not in session:
+		error = 'Please log in before purchasing a ticket'
+		return render_template('login.html', error=error)
+	else:
+		flight_number = request.args.get('flight_number')
+		departure_datetime = request.args.get('departure_datetime')
+
+		cursor = conn.cursor()
+		flightQuery = 'SELECT * ' \
+			'FROM Flight ' \
+			'WHERE flight_number = %s'
+		cursor.execute(flightQuery, (flight_number,))
+		theFlight = cursor.fetchone()
+		if theFlight is None:
+			error = "Flight not found."
+			return render_template('purchase.html', error=error)
+
+		return render_template('purchase.html', theFlight=theFlight)
 
 
 #Define route for login
@@ -101,7 +137,7 @@ def loginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return redirect(url_for('home'))
+		return redirect(url_for('landingPage'))
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
@@ -134,8 +170,7 @@ def registerAuth():
 		cursor.execute(ins, (username, password))
 		conn.commit()
 		cursor.close()
-		return render_template('index.html')
-
+		return redirect(url_for('landingPage'))
 
 @app.route('/home')
 def home():

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+
+  <h2>Purchasing Flight:</h2>
+  <table>
+		<tr>
+			<th>Airline</th>
+			<th>Flight Number</th>
+			<th>Departure Datetime</th>
+			<th>Departure Airport</th>
+			<th>Arrival Datetime</th>
+			<th>Arrival Airport</th>
+			<th>Base Price</th>
+			<th>Seats Remaining</th>
+			<th>Status</th>
+		</tr>
+    <tr>
+      <td>{{ theFlight.airline_name }}</td>
+      <td>{{ theFlight.flight_number }}</td>
+      <td>{{ theFlight.departure_datetime }}</td>
+      <td>{{ theFlight.departure_airport_name }}</td>
+      <td>{{ theFlight.arrival_datetime }}</td>
+      <td>{{ theFlight.arrival_airport_name }}</td>
+      <td>{{ theFlight.base_price }}</td>
+      <td>{{ theFlight.remaining_seats }}</td>
+      <td>{{ theFlight.status }}</td>
+    </tr>
+	</table>
+
+  <a href="/logout">Logout</a>
+
+</body>
+
+</html>

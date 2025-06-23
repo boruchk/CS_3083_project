@@ -1,0 +1,20 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/loginAuthStaff" method="POST">
+	<h2>Staff Login</h2>
+	{% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	<input type="text" name = "username" placeholder="Username" required/> </br>
+	<input type="password" name = "password" placeholder="Password" required/></br>
+	<input type="submit" value = Login />
+</form>
+<a href="/registerStaff">Register as a customer</a>
+</br>
+<a href="/">Home</a>
+
+</body>
+
+</html>

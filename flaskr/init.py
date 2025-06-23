@@ -20,6 +20,13 @@ conn = pymysql.connect(host='localhost',
 #Define a route to landingPage function
 @app.route('/',methods=['GET', 'POST'])
 def landingPage():
+	if 'username' in session:
+		user_type = session['user_type']
+		if user_type == 'customer':
+			return redirect(url_for('dashboardCustomer'))
+		elif user_type == 'staff':
+			return redirect(url_for('dashboardStaff'))
+	
 	departureDate = request.args.get('departureDate')
 	returnDate = request.args.get('returnDate')
 	roundTrip = request.args.get('roundTrip')
@@ -79,6 +86,20 @@ def landingPage():
 												returnFlights=returnFlights, 
 												error=error)
 
+# FOR BARUT AND DYLAN
+@app.route('/dashboardCustomer')
+def dashboardCustomer():
+    if session.get('user_type') != 'customer':
+        return redirect(url_for('login'))
+    return render_template('dashboardCustomer.html')
+
+
+@app.route('/staffDashboard')
+def staffDashboard():
+    if session.get('user_type') != 'customer':
+        return redirect(url_for('login'))
+    return render_template('staffDashboard.html')
+
 
 @app.route('/purchase')
 def purchase():
@@ -103,107 +124,154 @@ def purchase():
 		return render_template('purchase.html', theFlight=theFlight)
 
 
-#Define route for login
-@app.route('/login')
-def login():
-	return render_template('login.html')
+@app.route('/loginCustomer')
+def loginCustomer():
+	return render_template('loginCustomer.html')
 
 
-#Define route for register
-@app.route('/register')
-def register():
-	return render_template('register.html')
+@app.route('/loginStaff')
+def loginStaff():
+	return render_template('loginStaff.html')
 
 
-#Authenticates the login
-@app.route('/loginAuth', methods=['GET', 'POST'])
-def loginAuth():
-	#grabs information from the forms
-	username = request.form['username']
+#Authenticates the customer login
+@app.route('/loginAuthCustomer', methods=['GET', 'POST'])
+def loginAuthCustomer():
+	email = request.form['email']
 	password = request.form['password']
 
-	#cursor used to send queries
 	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM user WHERE username = %s and password = %s'
-	cursor.execute(query, (username, password))
-	#stores the results in a variable
+	query = 'SELECT email, password FROM Customer WHERE email = %s and password = %s'
+	cursor.execute(query, (email, password))
 	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 
 	error = None
 	if(data):
-		#creates a session for the the user
-		#session is a built in
-		session['username'] = username
+		session['username'] = email
+		session['user_type'] = 'customer'
 		return redirect(url_for('landingPage'))
 	else:
-		#returns an error message to the html page
 		error = 'Invalid login or username'
-		return render_template('login.html', error=error)
+		return render_template('loginCustomer.html', error=error)
+	
 
-
-#Authenticates the register
-@app.route('/registerAuth', methods=['GET', 'POST'])
-def registerAuth():
-	#grabs information from the forms
+#Authenticates the staff login
+@app.route('/loginAuthStaff', methods=['GET', 'POST'])
+def loginAuthStaff():
 	username = request.form['username']
 	password = request.form['password']
 
-	#cursor used to send queries
 	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM user WHERE username = %s'
-	cursor.execute(query, (username))
-	#stores the results in a variable
+	query = 'SELECT username, password FROM user WHERE username = %s and password = %s'
+	cursor.execute(query, (username, password))
 	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
+	cursor.close()
 
 	error = None
 	if(data):
-		#If the previous query returns data, then user exists
-		error = "This user already exists"
-		return render_template('register.html', error = error)
+		session['username'] = username
+		session['user_type'] = 'staff'
+		return redirect(url_for('landingPage'))
 	else:
-		ins = 'INSERT INTO user VALUES(%s, %s)'
-		cursor.execute(ins, (username, password))
+		error = 'Invalid login or username'
+		return render_template('loginStaff.html', error=error)
+
+
+@app.route('/registerCustomer')
+def registerCustomer():
+	return render_template('registerCustomer.html')
+
+
+@app.route('/registerStaff')
+def registerStaff():
+	return render_template('registerStaff.html')
+
+
+#Authenticates the customer registeration
+@app.route('/registerCustomerAuth', methods=['GET', 'POST'])
+def registerCustomerAuth():
+	email = request.form['email']
+	name = request.form['name']
+	password = request.form['password']
+	dob = request.form['date_of_birth']
+	phone_number = request.form['phone_number']
+	passport_number = request.form['passport_number']
+	passport_exp = request.form['passport_exp']
+	passport_ctry = request.form['passport_ctry']
+	bldg_number = request.form['bldg_number']
+	street_name = request.form['street_name']
+	city = request.form['city']
+	state = request.form['state']
+
+	cursor = conn.cursor()
+	# check if email/username already exists as a customer or staff 
+	customer_query = 'SELECT email FROM Customer WHERE email = %s'
+	staff_query = 'SELECT username FROM Staff WHERE username = %s'
+	cursor.execute(customer_query, (email))
+	customer = cursor.fetchone()
+	cursor.execute(staff_query, (email))
+	staff = cursor.fetchone()
+
+	error = None
+	if(customer or staff):
+		error = "User already exists. Please use a different email address"
+		return render_template('registerCustomer.html', error = error)
+	else:
+		ins = 'INSERT INTO Customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (email, name, password, 
+											 bldg_number, street_name, city, state, 
+											 phone_number, 
+											 passport_number, passport_exp, passport_ctry, 
+											 dob))
 		conn.commit()
 		cursor.close()
+		session['username'] = email
+		session['user_type'] = 'customer'
 		return redirect(url_for('landingPage'))
+	
 
-@app.route('/home')
-def home():
-    username = session['username']
-
-    cursor = conn.cursor()
-    query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-    cursor.execute(query, (username))
-    data1 = cursor.fetchall() 
-    cursor.close()
-
-    # for each in data1:
-    #     print(each['blog_post'])
-    return render_template('home.html', username=username, posts=data1)
-
-		
-@app.route('/post', methods=['GET', 'POST'])
-def post():
-	username = session['username']
+#Authenticates the staff registeration
+@app.route('/registerStaffAuth', methods=['GET', 'POST'])
+def registerStaffAuth():
+	username = request.form['username']
+	password = request.form['password']
+	first_name = request.form['first_name']
+	last_name = request.form['last_name']
+	dob = request.form['date_of_birth']
+	email = request.form['email']
+	works_for = request.form['works_for']
 
 	cursor = conn.cursor()
-	blog = request.form['blog']
-	query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
-	cursor.execute(query, (blog, username))
-	conn.commit()
-	cursor.close()
-	
-	return redirect(url_for('home'))
+	# check if email/username already exists as a customer or staff 
+	customer_query = 'SELECT email FROM Customer WHERE email = %s'
+	staff_query = 'SELECT username FROM Staff WHERE username = %s'
+	cursor.execute(customer_query, (email))
+	customer = cursor.fetchone()
+	cursor.execute(staff_query, (email))
+	staff = cursor.fetchone()
+
+	error = None
+	if(customer or staff):
+		error = "User already exists. Please select another username"
+		return render_template('registerStaff.html', error = error)
+	else:
+		ins = 'INSERT INTO Staff VALUES(%s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (username, password, 
+											 first_name, last_name, dob, 
+											 email, works_for))
+		conn.commit()
+		cursor.close()
+		session['username'] = username
+		session['user_type'] = 'staff'
+		return redirect(url_for('landingPage'))
 
 
 @app.route('/logout')
 def logout():
-	session.pop('username')
+	if 'username' in session:
+		session.pop('username')
+		session.pop('user_type')
 	return redirect('/')
 
 

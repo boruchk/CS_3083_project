@@ -95,12 +95,6 @@ CREATE TABLE Ticket(
     REFERENCES Flight(airline_name, flight_number, departure_datetime)
 );
 
-CREATE TABLE User(
-	username varchar(50),
-	password varchar(50),
-	PRIMARY KEY(username)
-);
-
 CREATE TABLE blog(
 	blog_post varchar(500),
 	username varchar(50),

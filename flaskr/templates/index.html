@@ -6,76 +6,174 @@
 </head>
 
 <body>
-	<a href="/login">Login</a>
-	<a href="/register">Register</a> </br>
+	<div class="top-links">
+		<a href="/loginCustomer">Customer Login</a> </br>
+		<a href="/loginStaff">Staff Login</a> </br>
+		<a href="/registerCustomer">Customer Register</a> </br>
+		<a href="/registerStaff">Staff Register</a> </br>
+	</div>
 
-	<form action="/" method="GET">
-		<label for="departureDate">Departure Date:</label>
-		<input type="date" name="departureDate" required> <br><br>
+	<div class="main-wrapper">
+		<div class="center-content">
+			<h2>Search for a flight</h2>
+			<form action="/" method="GET">
+				<label for="departureDate">Departure Date:</label>
+				<input type="date" name="departureDate" required> <br><br>
 
-		<label for="departureCities">Choose a departure city:</label>
-		<select name="departureCities" id="departureCities" required>
-			{% for city in departureCities %}
-				<option value="{{ city.city }}">{{ city.city }}</option>
-			{% endfor %}
-		</select><br><br>
+				<label>
+					<input type="checkbox" name="roundTrip" value="yes"> Round Trip &nbsp; 
+				</label>
+				
+				<label for="returnDate">Return Date:</label>
+				<input type="date" name="returnDate"> <br><br>
 
-		<label for="departureAirports">Choose a departure airport:</label>
-		<select name="departureAirports" id="departureAirports" required>
-			{% for airport in departureAirports %}
-				<option value="{{ airport.name }}">{{ airport.name }}</option>
-			{% endfor %}
-		</select><br><br>
-		
+				<label for="departureCities">Choose a departure city:</label>
+				<select name="departureCities" id="departureCities" required>
+					{% for city in departureCities %}
+						<option value="{{ city.city }}">{{ city.city }}</option>
+					{% endfor %}
+				</select><br><br>
 
-		<label for="arrivalCities">Choose an arrival city:</label>
-		<select name="arrivalCities" id="arrivalCities" required>
-			{% for city in arrivalCities %}
-				<option value="{{ city.city }}">{{ city.city }}</option>
-			{% endfor %}
-		</select><br><br>
+				<label for="departureAirports">Choose a departure airport:</label>
+				<select name="departureAirports" id="departureAirports" required>
+					{% for airport in departureAirports %}
+						<option value="{{ airport.name }}">{{ airport.name }}</option>
+					{% endfor %}
+				</select><br><br>
+				
 
-		<label for="arrivalAirports">Choose an arrival airport:</label>
-		<select name="arrivalAirports" id="arrivalAirports" required>
-			{% for airport in arrivalAirports %}
-				<option value="{{ airport.name }}">{{ airport.name }}</option>
-			{% endfor %}
-		</select><br><br>
+				<label for="arrivalCities">Choose an arrival city:</label>
+				<select name="arrivalCities" id="arrivalCities" required>
+					{% for city in arrivalCities %}
+						<option value="{{ city.city }}">{{ city.city }}</option>
+					{% endfor %}
+				</select><br><br>
 
-		<input type="submit" value="Search Flights">
-	</form>
+				<label for="arrivalAirports">Choose an arrival airport:</label>
+				<select name="arrivalAirports" id="arrivalAirports" required>
+					{% for airport in arrivalAirports %}
+						<option value="{{ airport.name }}">{{ airport.name }}</option>
+					{% endfor %}
+				</select><br><br>
+
+				<input type="submit" value="Search Flights"> </br>
+			</form>
+		</div>
+
+		<div>
+			{% if error %}
+				<p class="error"> {{ error }} </p>
+			{% endif %}
+			{% if departureFlights %}
+			<div class="results">
+				<h2>Departing Flights</h2>
+				<table>
+					<tr>
+						<th>Airline</th>
+						<th>Flight Number</th>
+						<th>Departure Datetime</th>
+						<th>Departure Airport</th>
+						<th>Arrival Datetime</th>
+						<th>Arrival Airport</th>
+						<th>Base Price</th>
+						<th>Seats Remaining</th>
+						<th>Status</th>
+					</tr>
+					{% for flight in departureFlights %}
+						<tr onclick="location.href='/purchase?flight_number={{ flight.flight_number }}&departure_datetime={{ flight.departure_datetime }}'" style="cursor: pointer;">
+							<td>{{ flight.airline_name }}</td>
+							<td>{{ flight.flight_number }}</td>
+							<td>{{ flight.departure_datetime }}</td>
+							<td>{{ flight.departure_airport_name }}</td>
+							<td>{{ flight.arrival_datetime }}</td>
+							<td>{{ flight.arrival_airport_name }}</td>
+							<td>{{ flight.base_price }}</td>
+							<td>{{ flight.remaining_seats }}</td>
+							<td>{{ flight.status }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			{% endif %}
 
 
-	<h2>Upcoming Flights</h2>
-	{% if error %}
-		<p class="error"> {{ error }} </p>
-	{% endif %}
-	<table>
-		<tr>
-			<th>Airline</th>
-			<th>Flight Number</th>
-			<th>Departure Datetime</th>
-			<th>Departure Airport</th>
-			<th>Arrival Datetime</th>
-			<th>Arrival Airport</th>
-			<th>Base Price</th>
-			<th>Seats Remaining</th>
-			<th>Status</th>
-		</tr>
-		{% for flight in departureFlights %}
-			<tr>
-				<td>{{ flight.airline_name }}</td>
-				<td>{{ flight.flight_number }}</td>
-				<td>{{ flight.departure_datetime }}</td>
-				<td>{{ flight.departure_airport_name }}</td>
-				<td>{{ flight.arrival_datetime }}</td>
-				<td>{{ flight.arrival_airport_name }}</td>
-				<td>{{ flight.base_price }}</td>
-				<td>{{ flight.remaining_seats }}</td>
-				<td>{{ flight.status }}</td>
-			</tr>
-		{% endfor %}
-	</table>
+			{% if error %}
+				<p class="error"> {{ error }} </p>
+			{% endif %}
+			{% if returnFlights %}
+			<div class="results">
+				<h2>Returning Flights</h2>
+				<table>
+					<tr>
+						<th>Airline</th>
+						<th>Flight Number</th>
+						<th>Departure Datetime</th>
+						<th>Departure Airport</th>
+						<th>Arrival Datetime</th>
+						<th>Arrival Airport</th>
+						<th>Base Price</th>
+						<th>Seats Remaining</th>
+						<th>Status</th>
+					</tr>
+					{% for flight in returnFlights %}
+						<tr onclick="location.href='/purchase?flight_number={{ flight.flight_number }}&departure_datetime={{ flight.departure_datetime }}'" style="cursor: pointer;">
+							<td>{{ flight.airline_name }}</td>
+							<td>{{ flight.flight_number }}</td>
+							<td>{{ flight.departure_datetime }}</td>
+							<td>{{ flight.departure_airport_name }}</td>
+							<td>{{ flight.arrival_datetime }}</td>
+							<td>{{ flight.arrival_airport_name }}</td>
+							<td>{{ flight.base_price }}</td>
+							<td>{{ flight.remaining_seats }}</td>
+							<td>{{ flight.status }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+
+<style type="text/css">
+	body {
+		margin: 0;
+		position: relative;
+		font-family: sans-serif;
+	}
+	.top-links {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: absolute;
+		justify-content: center;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 20px;
+	}
+	.main-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+	}
+	.center-content {
+		text-align: center;
+		background-color: #f0f0f0;
+		padding: 10px;
+	}
+	.results {
+		margin-top: 20px;
+		background-color: #d0e0ff;
+		padding: 15px;
+	}
+	table, th, td{
+		border: 1px solid black;
+		align-content: center;
+	}
+</style>
 
 
 </body>

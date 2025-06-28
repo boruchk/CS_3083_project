@@ -30,7 +30,7 @@
 						<th>rating</th>
 					</tr>
 					{% for flight in purchasedFlights %}
-						<tr>
+						<tr onclick="location.href='/commentAndRate?ticket_id={{flight.ID}}'" style="cursor: pointer;">
 							<td>{{ flight.airline_name }}</td>
 							<td>{{ flight.flight_number }}</td>
 							<td>{{ flight.departure_datetime }}</td>

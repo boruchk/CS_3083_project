@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
+	<title>Home</title>
 </head>
 
 <body>
 	<div class="top-links">
+		<h2>Welcome to our flight search page!</h2>
 		<a href="/loginCustomer">Customer Login</a> </br>
 		<a href="/loginStaff">Staff Login</a> </br>
 		<a href="/registerCustomer">Customer Register</a> </br>
 		<a href="/registerStaff">Staff Register</a> </br>
+		<a href="/dashboardCustomer">Customer home page</a> </br>
+		<a href="/dashboardStaff">Staff home page</a> </br>
 	</div>
-
 	<div class="main-wrapper">
 		<div class="center-content">
+			{% if error %}
+				<p class="error"> {{ error }} </p>
+			{% endif %}
 			<h2>Search for a flight</h2>
 			<form action="/" method="GET">
 				<label for="departureDate">Departure Date:</label>
@@ -61,8 +65,8 @@
 		</div>
 
 		<div>
-			{% if error %}
-				<p class="error"> {{ error }} </p>
+			{% if originFlightsError %}
+				<p class="error"> {{ originFlightsError }} </p>
 			{% endif %}
 			{% if departureFlights %}
 			<div class="results">
@@ -80,14 +84,14 @@
 						<th>Status</th>
 					</tr>
 					{% for flight in departureFlights %}
-						<tr onclick="location.href='/purchase?flight_number={{ flight.flight_number }}&departure_datetime={{ flight.departure_datetime }}'" style="cursor: pointer;">
+						<tr onclick="location.href='/purchase?airline_name={{flight.airline_name}}&flight_number={{ flight.flight_number }}&departure_datetime={{flight.departure_datetime}}'" style="cursor: pointer;">
 							<td>{{ flight.airline_name }}</td>
 							<td>{{ flight.flight_number }}</td>
 							<td>{{ flight.departure_datetime }}</td>
 							<td>{{ flight.departure_airport_name }}</td>
 							<td>{{ flight.arrival_datetime }}</td>
 							<td>{{ flight.arrival_airport_name }}</td>
-							<td>{{ flight.base_price }}</td>
+							<td>${{ flight.base_price }}</td>
 							<td>{{ flight.remaining_seats }}</td>
 							<td>{{ flight.status }}</td>
 						</tr>
@@ -97,8 +101,8 @@
 			{% endif %}
 
 
-			{% if error %}
-				<p class="error"> {{ error }} </p>
+			{% if returnFlightsError %}
+				<p class="error"> {{ returnFlightsError }} </p>
 			{% endif %}
 			{% if returnFlights %}
 			<div class="results">
@@ -116,14 +120,14 @@
 						<th>Status</th>
 					</tr>
 					{% for flight in returnFlights %}
-						<tr onclick="location.href='/purchase?flight_number={{ flight.flight_number }}&departure_datetime={{ flight.departure_datetime }}'" style="cursor: pointer;">
+						<tr onclick="location.href='/purchase?airline_name={{flight.airline_name}}&flight_number={{ flight.flight_number }}&departure_datetime={{flight.departure_datetime}}'" style="cursor: pointer;">
 							<td>{{ flight.airline_name }}</td>
 							<td>{{ flight.flight_number }}</td>
 							<td>{{ flight.departure_datetime }}</td>
 							<td>{{ flight.departure_airport_name }}</td>
 							<td>{{ flight.arrival_datetime }}</td>
 							<td>{{ flight.arrival_airport_name }}</td>
-							<td>{{ flight.base_price }}</td>
+							<td>${{ flight.base_price }}</td>
 							<td>{{ flight.remaining_seats }}</td>
 							<td>{{ flight.status }}</td>
 						</tr>
@@ -133,45 +137,68 @@
 			{% endif %}
 		</div>
 	</div>
+	
+	<div class="bottom-links">
+    <a href="/logout">Logout</a>
+    <a href="/">Home</a>
+  </div>
 
 
 <style type="text/css">
 	body {
 		margin: 0;
-		position: relative;
 		font-family: sans-serif;
 	}
 	.top-links {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		position: absolute;
-		justify-content: center;
-		top: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		padding: 20px;
+		text-align: center;
+		margin-top: 20px;
+	}
+	.top-links a {
+		display: inline-table;
+		margin: 5px 0;
+		text-decoration: none;
+		color: #663399;
+	}
+	.bottom-links {
+		text-align: center;
+		margin-top: 20px;
+	}
+	.bottom-links a {
+		display: inline-block;
+    padding: 7px;
+		margin: 5px 0;
+		text-decoration: none;
+		color: #663399;
 	}
 	.main-wrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		min-height: 100vh;
+		padding-top: 20px;
 	}
 	.center-content {
 		text-align: center;
 		background-color: #f0f0f0;
-		padding: 10px;
+		padding: 20px;
+		border-radius: 8px;
+		margin-top: 20px;
 	}
 	.results {
 		margin-top: 20px;
 		background-color: #d0e0ff;
 		padding: 15px;
+		border-radius: 8px;
 	}
-	table, th, td{
+	table, th, td {
 		border: 1px solid black;
-		align-content: center;
+		border-collapse: collapse;
+		padding: 8px;
+		text-align: center;
+	}
+	.error {
+		color: red;
+		margin-top: 15px;
 	}
 </style>
 

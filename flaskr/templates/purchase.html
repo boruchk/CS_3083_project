@@ -2,39 +2,130 @@
 <html>
 
 <head>
-
+  <title>Purchase</title>
 </head>
 
 <body>
+  <div class="main-wrapper">
+		<div class="center-content">
+      <h2>Purchasing Flight:</h2>
+      {% if theFlight %}
+        <table>
+          <tr>
+            <th>Airline</th>
+            <th>Flight Number</th>
+            <th>Departure Datetime</th>
+            <th>Departure Airport</th>
+            <th>Arrival Datetime</th>
+            <th>Arrival Airport</th>
+            <th>Price</th>
+            <th>Seats Remaining</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>{{ theFlight.airline_name }}</td>
+            <td>{{ theFlight.flight_number }}</td>
+            <td>{{ theFlight.departure_datetime }}</td>
+            <td>{{ theFlight.departure_airport_name }}</td>
+            <td>{{ theFlight.arrival_datetime }}</td>
+            <td>{{ theFlight.arrival_airport_name }}</td>
+            <td>${{ price }}</td>
+            <td>{{ theFlight.remaining_seats }}</td>
+            <td>{{ theFlight.status }}</td>
+          </tr>
+        </table> </br>
+      {% endif %}
+        
+      {% if not theFlight %}
+				<p class="error"> {{ error }} </p>
+			{% endif %}
 
-  <h2>Purchasing Flight:</h2>
-  <table>
-		<tr>
-			<th>Airline</th>
-			<th>Flight Number</th>
-			<th>Departure Datetime</th>
-			<th>Departure Airport</th>
-			<th>Arrival Datetime</th>
-			<th>Arrival Airport</th>
-			<th>Base Price</th>
-			<th>Seats Remaining</th>
-			<th>Status</th>
-		</tr>
-    <tr>
-      <td>{{ theFlight.airline_name }}</td>
-      <td>{{ theFlight.flight_number }}</td>
-      <td>{{ theFlight.departure_datetime }}</td>
-      <td>{{ theFlight.departure_airport_name }}</td>
-      <td>{{ theFlight.arrival_datetime }}</td>
-      <td>{{ theFlight.arrival_airport_name }}</td>
-      <td>{{ theFlight.base_price }}</td>
-      <td>{{ theFlight.remaining_seats }}</td>
-      <td>{{ theFlight.status }}</td>
-    </tr>
-	</table>
+      {% if not purchaseComplete and theFlight %}
+        <h3>Please enter your credit card information below</h3>
+        <form class="cc-info" action="/processCard" method="POST">
+          <div>
+            <label for="card_number">Card number:</label><br>
+            <input type="text" id="card_number" name="card_number">
+          </div>
+          <div>
+            <p>Card type:</p>
+            <input type="radio" id="Amex" name="card_type" value="Amex">
+            <label for="Amex">Amex</label><br>
+            <input type="radio" id="Visa" name="card_type" value="Visa">
+            <label for="Visa">Visa</label><br>
+            <input type="radio" id="MasterCard" name="card_type" value="MasterCard">
+            <label for="MasterCard">MasterCard</label><br>
+            <input type="radio" id="Discover" name="card_type" value="Discover">
+            <label for="Discover">Discover</label><br>
+          </div>
+          <div>
+            <label for="exp_date">Expiration:</label>
+            <input type="date" name="exp_date" required> <br><br>
+          </div>
+          <div>
+            <input type="submit" value="Submit"> </br>
+          </div>
+          <input type="hidden" name="airline_name" value="{{ theFlight.airline_name }}">
+          <input type="hidden" name="flight_number" value="{{ theFlight.flight_number }}">
+          <input type="hidden" name="departure_datetime" value="{{ theFlight.departure_datetime }}">
+          <input type="hidden" name="price" value="{{ price }}">
+        </form>
+      {% endif %}
+    </div>
+  </div>
 
-  <a href="/logout">Logout</a>
+  <div class="bottom-links">
+    <a href="/logout">Logout</a>
+    <a href="/">Home</a>
+  </div>
 
 </body>
+
+<style type="text/css">
+	body {
+		margin: 0;
+		font-family: sans-serif;
+	}
+	.bottom-links {
+		text-align: center;
+		margin-top: 20px;
+	}
+	.bottom-links a {
+		display: inline-block;
+    padding: 7px;
+		margin: 5px 0;
+		text-decoration: none;
+		color: #663399;
+	}
+	.main-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding-top: 20px;
+	}
+	.center-content {
+		text-align: center;
+		background-color: #f0f0f0;
+		padding: 20px;
+		border-radius: 8px;
+		margin-top: 20px;
+	}
+  .cc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+	table, th, td {
+		border: 1px solid black;
+		border-collapse: collapse;
+		padding: 8px;
+		text-align: center;
+	}
+	.error {
+		color: red;
+		margin-top: 15px;
+	}
+</style>
 
 </html>

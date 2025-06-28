@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title>Customer Login</title>
+</head>
+<body>
+<form action="/submitCommentAndRate" method="POST">
+	<h2>Submit a comment</h2>
+	{% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	<input type="text" name = "comment" placeholder="Type your comment here"/> </br>
+  <div>
+    <p>Rate the flight out of 5:</p>
+    <input type="radio" id="One" name="rating" value="1">
+    <label for="One">One</label><br>
+    <input type="radio" id="Two" name="rating" value="2">
+    <label for="Two">Two</label><br>
+    <input type="radio" id="Three" name="rating" value="3">
+    <label for="Three">Three</label><br>
+    <input type="radio" id="Four" name="rating" value="4">
+    <label for="Four">Four</label><br>
+    <input type="radio" id="Five" name="rating" value="5">
+    <label for="Five">Five</label><br>
+  </div>
+	<input type="submit" value = Submit />
+	<input type="hidden" name="ticket_id" value="{{ ticket_id }}">
+</form>
+<a href="/logout">Logout</a></br>
+<a href="/">Home</a>
+
+</body>
+
+</html>

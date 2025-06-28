@@ -40,7 +40,7 @@
 							<td>${{ flight.sold_price }}</td>
 							<td>{{ flight.purchase_datetime }}</td>
 							<td onclick="location.href='/commentAndRate?ticket_id={{flight.ID}}'" style="cursor: pointer;">{{ flight.comments }}</td>
-							<td onclick="location.href='/'" style="cursor: pointer;">{{ flight.rating }}</td>
+							<td onclick="location.href='/commentAndRate?ticket_id={{flight.ID}}'" style="cursor: pointer;">{{ flight.rating }}</td>
 						</tr>
 					{% endfor %}
 				</table>

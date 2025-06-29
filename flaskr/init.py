@@ -188,11 +188,31 @@ def submitComment():
 	return redirect(url_for('dashboardCustomer'))
 
 
-@app.route('/staffDashboard')
-def staffDashboard():
-    if session.get('user_type') != 'customer':
-        return redirect(url_for('loginCustomer'))
-    return render_template('staffDashboard.html')
+@app.route('/dashboardStaff')
+def dashboardStaff():
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+	
+	username = session.get('username')
+	name = 'Staff'
+	workFlights = []
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	if user:
+		name = user['first_name']
+		airline = user['works_for']
+		# default to view the flights in the next 30 days
+		flightQuery = 'SELECT * FROM flight WHERE departure_datetime > CURRENT_DATE() and departure_datetime < CURRENT_DATE() + INTERVAL 30 DAY and airline_name = %s; '
+		cursor = conn.cursor()
+		cursor.execute(flightQuery, (airline, ))
+		workFlights = cursor.fetchall()
+		cursor.close()
+
+	return render_template('dashboardStaff.html', name=name, workFlights=workFlights)
 
 
 @app.route('/purchase')
@@ -319,7 +339,7 @@ def loginAuthStaff():
 	password = request.form.get('password', '').strip()
 
 	cursor = conn.cursor()
-	query = 'SELECT username, password FROM user WHERE username = %s and password = %s'
+	query = 'SELECT username, password FROM staff WHERE username = %s and password = %s'
 	cursor.execute(query, (username, password))
 	data = cursor.fetchone()
 	cursor.close()

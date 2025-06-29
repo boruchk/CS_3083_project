@@ -188,11 +188,155 @@ def submitComment():
 	return redirect(url_for('dashboardCustomer'))
 
 
-@app.route('/staffDashboard')
-def staffDashboard():
-    if session.get('user_type') != 'customer':
-        return redirect(url_for('loginCustomer'))
-    return render_template('staffDashboard.html')
+@app.route('/dashboardStaff')
+def dashboardStaff():
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+	
+	username = session.get('username')
+	name = 'Staff'
+	workFlights = []
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	if user:
+		name = user['first_name']
+		airline = user['works_for']
+		# default to view the flights in the next 30 days
+		flightQuery = 'SELECT * FROM flight WHERE departure_datetime > CURRENT_DATE() and departure_datetime < CURRENT_DATE() + INTERVAL 30 DAY and airline_name = %s; '
+		cursor = conn.cursor()
+		cursor.execute(flightQuery, (airline, ))
+		workFlights = cursor.fetchall()
+		cursor.close()
+
+
+
+
+	
+	departureDate = request.args.get('departureDate')
+	departureAirport = request.args.get('departureAirports')
+	arrivalAirport = request.args.get('arrivalAirports')
+
+	cursor = conn.cursor()
+	cityQuery = 'SELECT DISTINCT city FROM Airport'
+	airportQuery = 'SELECT name FROM Airport'
+	flightQuery = 'SELECT * ' \
+		'FROM Flight ' \
+		'WHERE departure_datetime >= %s and ' \
+			'departure_datetime < DATE_ADD(%s, INTERVAL 1 DAY) and ' \
+			'departure_airport_name = %s and ' \
+			'arrival_airport_name = %s and airline_name = %s'
+		
+	cursor.execute(cityQuery)
+	departureCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	departureAirports = cursor.fetchall()
+	cursor.execute(cityQuery)
+	arrivalCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	arrivalAirports = cursor.fetchall()
+	
+	searchedFlights = []
+	searchedFlightsError=''
+	if departureDate and departureAirport and arrivalAirport:
+		cursor.execute(flightQuery, (departureDate, 
+																	departureDate,
+																	departureAirport, 
+																	arrivalAirport, airline))
+		searchedFlights = cursor.fetchall()
+
+
+	else:
+		searchedFlightsError = 'No flights for those choices'
+	
+	error = None
+	cursor.close()
+	return render_template('dashboardStaff.html', 
+												departureCities=departureCities,
+												departureAirports=departureAirports,
+												arrivalCities=arrivalCities,
+												arrivalAirports=arrivalAirports,
+												searchedFlights=searchedFlights, 
+												searchedFlightsError=searchedFlightsError,
+												error=error,
+												name=name, workFlights=workFlights, airline_name=airline)
+
+
+
+
+
+@app.route('/changeStatus', methods=['GET', 'POST'])
+def changeStatus():
+	if 'username' not in session:
+		return redirect(url_for('landingPage'))
+
+	airline_name = request.form.get('airline_name')
+	flight_number = request.form.get('flight_number')
+	departure_datetime = request.form.get('departure_datetime')
+	flight_status = request.form.get('flight_status')
+
+	if(flight_status == 'delayed'):
+		statusQuery = 'UPDATE flight SET status = \'on-time\' WHERE airline_name = %s and flight_number = %s and departure_datetime = %s;'
+	else:
+		statusQuery = 'UPDATE flight SET status = \'delayed\' WHERE airline_name = %s and flight_number = %s and departure_datetime = %s;'
+
+
+	cursor = conn.cursor()
+	cursor.execute(statusQuery, (airline_name, flight_number, departure_datetime,))
+	cursor.close()
+	if cursor.rowcount == 1:
+		print('updated status')
+		conn.commit()
+	else:
+		print('unable to update')
+		conn.rollback()
+
+	return redirect(url_for('dashboardStaff'))
+
+
+@app.route('/flightStaff')
+def flightStaff():
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+	
+	username = session.get('username')
+	customers = []
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	airline_name = request.args.get('airline_name')
+	flight_number = request.args.get('flight_number')
+	departure_datetime = request.args.get('departure_datetime')
+
+	average_rating = 0
+
+	if user:
+		customersQuery = 'SELECT * FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;'; 
+		cursor = conn.cursor()
+		cursor.execute(customersQuery, (airline_name, flight_number, departure_datetime,))
+		customers = cursor.fetchall()
+		cursor.close()
+
+		cursor = conn.cursor()
+		cursor.execute('SELECT AVG(rating) FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;', (airline_name, flight_number, departure_datetime,))
+		average_rating = cursor.fetchone()['AVG(rating)']
+		cursor.close()
+
+		statusQuery = 'SELECT status FROM flight WHERE airline_name = %s and flight_number = %s and departure_datetime = %s; '
+		cursor = conn.cursor()
+		cursor.execute(statusQuery, (airline_name, flight_number, departure_datetime,))
+		flight_status = cursor.fetchone()['status']
+		cursor.close()
+	
+	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, flight_status=flight_status, average_rating=average_rating)
+
+
 
 
 @app.route('/purchase')
@@ -319,7 +463,7 @@ def loginAuthStaff():
 	password = request.form.get('password', '').strip()
 
 	cursor = conn.cursor()
-	query = 'SELECT username, password FROM user WHERE username = %s and password = %s'
+	query = 'SELECT username, password FROM staff WHERE username = %s and password = %s'
 	cursor.execute(query, (username, password))
 	data = cursor.fetchone()
 	cursor.close()

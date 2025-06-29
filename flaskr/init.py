@@ -333,6 +333,61 @@ def flightStaff():
 	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, flight_status=flight_status, average_rating=average_rating)
 
 
+@app.route('/addAirplane')
+def addAirplane():
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+	
+	username = session.get('username')
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	if not user:
+		return redirect(url_for('registerStaff'))
+	works_for = user['works_for']
+	return render_template('addAirplane.html', works_for=works_for)
+
+
+@app.route('/submitAddAirplane', methods=['GET', 'POST'])
+def submitAddAirplane():
+	print("hello")
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+
+	username = session.get('username')
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	if not user:
+		return redirect(url_for('registerStaff'))
+
+	works_for = user['works_for']
+	airplane_id = request.form.get('ID')
+	seat_count = request.form.get('seat_count')
+	manufacturer = request.form.get('manufacturer')
+	manufacture_date = request.form.get('manufacture_date')
+
+	addPlaneQuery = 'INSERT INTO Airplane(airline_name, ID, seat_count, manufacturer, manufacture_date)' \
+	' values (%s, %s, %s, %s, %s);'
+	cursor = conn.cursor()
+	try:
+		cursor.execute(addPlaneQuery, (works_for, airplane_id, seat_count, manufacturer, manufacture_date,))
+		cursor.close()
+		conn.commit()
+		notice = 'Airplane added successfully'
+	except Exception as e:
+		notice = 'Airplane ID is already taken'
+		conn.rollback()
+		works_for = user['works_for']
+		return render_template('addAirplane.html', works_for=works_for, notice=notice)
+
+	return render_template('addAirplane.html', works_for=works_for, notice=notice)
 
 
 @app.route('/purchase')

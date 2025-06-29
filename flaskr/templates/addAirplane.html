@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Add Airplane</title>
+</head>
+
+<body>
+
+  <h2>Add an airplane for {{works_for}}</h2>
+
+  {% if notice %}
+    <p class="notice"> {{ notice }} </p>
+  {% endif %}
+
+  <form action="/submitAddAirplane" method="POST">
+    <div>
+      <label for="ID">Airplane ID:</label><br>
+      <input type="text" id="ID" name="ID">
+    </div><br>
+
+    <div>
+      <label for="seat_count">Total Airplane Seat Count:</label><br>
+      <input type="text" id="seat_count" name="seat_count">
+    </div><br>
+
+    <div>
+      <label for="manufacturer">Airplane Manufacturer:</label><br>
+      <input type="text" id="manufacturer" name="manufacturer">
+    </div><br>
+
+    <div>
+      <label for="manufacture_date">Manufactured Date:</label><br>
+      <input type="date" name="manufacture_date" required> <br><br>
+    </div><br>
+
+    <input type="submit" value="Add Airplane"> </br>
+  </form>
+
+</body>
+
+
+<style type="text/css">
+	.notice {
+		color: rgb(64, 67, 240);
+		margin-top: 15px;
+	}
+</style>
+
+</html>

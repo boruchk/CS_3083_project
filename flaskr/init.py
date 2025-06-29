@@ -215,6 +215,42 @@ def dashboardStaff():
 	return render_template('dashboardStaff.html', name=name, workFlights=workFlights)
 
 
+@app.route('/flightStaff')
+def flightStaff():
+	if session.get('user_type') != 'staff':
+		return redirect(url_for('loginStaff'))
+	
+	username = session.get('username')
+	customers = []
+	userQuery = 'SELECT * FROM staff WHERE username = %s;'
+	cursor = conn.cursor()
+	cursor.execute(userQuery, (username,))
+	user = cursor.fetchone()
+	cursor.close()
+
+	airline_name = request.args.get('airline_name')
+	flight_number = request.args.get('flight_number')
+	departure_datetime = request.args.get('departure_datetime')
+
+	average_rating = 0
+
+	if user:
+		customersQuery = 'SELECT * FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;'; 
+		cursor = conn.cursor()
+		cursor.execute(customersQuery, (airline_name, flight_number, departure_datetime,))
+		customers = cursor.fetchall()
+		cursor.close()
+
+		cursor = conn.cursor()
+		cursor.execute('SELECT AVG(rating) FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;', (airline_name, flight_number, departure_datetime,))
+		average_rating = cursor.fetchone()
+		cursor.close()
+	
+	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, average_rating=average_rating['AVG(rating)'])
+
+
+
+
 @app.route('/purchase')
 def purchase():
 	error = None

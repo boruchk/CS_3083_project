@@ -212,7 +212,57 @@ def dashboardStaff():
 		workFlights = cursor.fetchall()
 		cursor.close()
 
-	return render_template('dashboardStaff.html', name=name, workFlights=workFlights)
+
+
+
+	
+	departureDate = request.args.get('departureDate')
+	departureAirport = request.args.get('departureAirports')
+	arrivalAirport = request.args.get('arrivalAirports')
+
+	cursor = conn.cursor()
+	cityQuery = 'SELECT DISTINCT city FROM Airport'
+	airportQuery = 'SELECT name FROM Airport'
+	flightQuery = 'SELECT * ' \
+		'FROM Flight ' \
+		'WHERE departure_datetime >= %s and ' \
+			'departure_datetime < DATE_ADD(%s, INTERVAL 1 DAY) and ' \
+			'departure_airport_name = %s and ' \
+			'arrival_airport_name = %s and airline_name = %s'
+		
+	cursor.execute(cityQuery)
+	departureCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	departureAirports = cursor.fetchall()
+	cursor.execute(cityQuery)
+	arrivalCities = cursor.fetchall()
+	cursor.execute(airportQuery)
+	arrivalAirports = cursor.fetchall()
+	
+	searchedFlights = []
+	searchedFlightsError=''
+	if departureDate and departureAirport and arrivalAirport:
+		cursor.execute(flightQuery, (departureDate, 
+																	departureDate,
+																	departureAirport, 
+																	arrivalAirport, airline))
+		searchedFlights = cursor.fetchall()
+
+
+	else:
+		searchedFlightsError = 'No flights for those choices'
+	
+	error = None
+	cursor.close()
+	return render_template('dashboardStaff.html', 
+												departureCities=departureCities,
+												departureAirports=departureAirports,
+												arrivalCities=arrivalCities,
+												arrivalAirports=arrivalAirports,
+												searchedFlights=searchedFlights, 
+												searchedFlightsError=searchedFlightsError,
+												error=error,
+												name=name, workFlights=workFlights, airline_name=airline)
 
 
 @app.route('/flightStaff')

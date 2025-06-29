@@ -1,33 +1,86 @@
 <html>
+
 <head>
 	<title>Comment and Rate</title>
 </head>
-<body>
-<form action="/submitCommentAndRate" method="POST">
-	<h2>Submit a comment</h2>
-	{% if error %}
-	<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-	<input type="text" name = "comment" placeholder="Type your comment here"/> </br>
-  <div>
-    <p>Rate the flight out of 5:</p>
-    <input type="radio" id="One" name="rating" value="1">
-    <label for="One">One</label><br>
-    <input type="radio" id="Two" name="rating" value="2">
-    <label for="Two">Two</label><br>
-    <input type="radio" id="Three" name="rating" value="3">
-    <label for="Three">Three</label><br>
-    <input type="radio" id="Four" name="rating" value="4">
-    <label for="Four">Four</label><br>
-    <input type="radio" id="Five" name="rating" value="5">
-    <label for="Five">Five</label><br>
-  </div>
-	<input type="submit" value = Submit />
-	<input type="hidden" name="ticket_id" value="{{ ticket_id }}">
-</form>
-<a href="/logout">Logout</a></br>
-<a href="/">Home</a>
 
+<body>
+  <form action="/submitCommentAndRate" method="POST">
+    <h2>Submit a comment</h2>
+
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+    {% endif %}
+
+    <input type="text" name = "comment" placeholder="Type your comment here"/> </br>
+    
+    <div id="rating-scale">
+      <p>Rate the flight out of 5:</p>
+      <input type="radio" id="1" name="rating" value="1">
+      <label for="1">1</label><br>
+      <input type="radio" id="2" name="rating" value="2">
+      <label for="2">2</label><br>
+      <input type="radio" id="3" name="rating" value="3">
+      <label for="3">3</label><br>
+      <input type="radio" id="4" name="rating" value="4">
+      <label for="4">4</label><br>
+      <input type="radio" id="5" name="rating" value="5">
+      <label for="5">5</label><br>
+    </div>
+
+    <input type="submit" value = Submit />
+    <input type="hidden" name="ticket_id" value="{{ ticket_id }}">
+
+  </form>
+  <!-- bottom links -->
+  <div>
+    <a href="/logout">Logout</a></br>
+    <a href="/">Home</a>
+  </div>
+  
 </body>
+
+
+<style type="text/css">
+  body {
+    margin: 0;
+		position: relative;
+		font-family: sans-serif;
+	}
+  .rating-scale {
+    direction: ltr;     
+  }
+	.bottom-links {
+		text-align: center;
+		margin-top: 20px;
+	}
+	.bottom-links a {
+		display: inline-block;
+    padding: 7px;
+		margin: 5px 0;
+		text-decoration: none;
+		color: #663399;
+	}
+	.main-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+	}
+	.center-content {
+		text-align: center;
+		padding: 10px;
+	}
+	.results {
+		margin-top: 20px;
+		background-color: #d0e0ff;
+		padding: 15px;
+	}
+	table, th, td{
+		border: 1px solid black;
+		align-content: center;
+	}
+</style>
 
 </html>

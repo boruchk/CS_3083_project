@@ -10,6 +10,18 @@
 		<div class="center-content">
 			<h2>{{ airline_name }} Flight {{ flight_number }} </h2>
 			<h4>{{ departure_datetime }} </h4>
+			<h4>{{ flight_status }} </h4>
+
+
+			<form action="/changeStatus" method="POST">
+			<input type="hidden" name="airline_name" value="{{ airline_name }}">
+			<input type="hidden" name="flight_number" value="{{ flight_number }}">
+			<input type="hidden" name="departure_datetime" value="{{ departure_datetime }}">
+			<input type="hidden" name="flight_status" value="{{ flight_status }}">
+			<input type="submit" value = "Change Status">
+			</form>
+
+
 			{% if average_rating %}
 			<h5>Average rating: {{ average_rating }}</h5>
 			{% endif %}

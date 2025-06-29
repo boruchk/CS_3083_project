@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Flight</title>
+</head>
+
+<body>
+	<div class="main-wrapper">
+		<div class="center-content">
+			<h2>{{ airline_name }} Flight {{ flight_number }} </h2>
+			<h4>{{ departure_datetime }} </h4>
+			{% if average_rating %}
+			<h5>Average rating: {{ average_rating }}</h5>
+			{% endif %}
+		</div>
+
+		{% if customers %}
+			<div class="results">
+				<div class="center-content">
+					<h2 class="title" >Customers:</h2>
+				</div>
+				<table>
+					<tr>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Phone</th>
+						<th>Address</th>
+						<th>Date of Birth</th>
+						<th>Passport Number</th>
+						<th>Passport Expiration</th>
+						<th>Passport Country</th>
+						<th>Purchase Datetime</th>
+						<th>Rating</th>
+						<th>Comments</th>
+					</tr>
+					{% for c in customers %}
+						<tr>
+							<td>{{ c.name }}</td>
+							<td>{{ c.email }}</td>
+							<td>{{ c.phone_number }}</td>
+							<td>{{ c.bldg_number }} {{ c.street_name }}, {{ c.city }}, {{ c.state}}</td>
+							<td>{{ c.date_of_birth }}</td>
+							<td>{{ c.passport_number }}</td>
+							<td>{{ c.passport_exp }}</td>
+							<td>{{ c.passport_country }}</td>
+							<td>{{ c.purchase_datetime }}</td>
+							<td>{{ c.rating }}</td>
+							<td>{{ c.comments }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		{% endif %}
+
+		<div class="bottom-links">
+			<a href="/logout">Logout</a>
+			<a href="/">Home</a>
+		</div>
+	</div>
+
+
+<style type="text/css">
+	body {
+		margin: 0;
+		position: relative;
+		font-family: sans-serif;
+	}
+	.bottom-links {
+		text-align: center;
+		margin-top: 20px;
+	}
+	.bottom-links a {
+		display: inline-block;
+    padding: 7px;
+		margin: 5px 0;
+		text-decoration: none;
+		color: #663399;
+	}
+	.main-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+	}
+	.center-content {
+		text-align: center;
+		padding: 10px;
+	}
+	.results {
+		margin-top: 20px;
+		background-color: #d0e0ff;
+		padding: 15px;
+	}
+	table, th, td{
+		border: 1px solid black;
+		align-content: center;
+	}
+</style>
+
+
+</body>
+
+</html>

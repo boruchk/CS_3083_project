@@ -265,6 +265,38 @@ def dashboardStaff():
 												name=name, workFlights=workFlights, airline_name=airline)
 
 
+
+
+
+@app.route('/changeStatus', methods=['GET', 'POST'])
+def changeStatus():
+	if 'username' not in session:
+		return redirect(url_for('landingPage'))
+
+	airline_name = request.form.get('airline_name')
+	flight_number = request.form.get('flight_number')
+	departure_datetime = request.form.get('departure_datetime')
+	flight_status = request.form.get('flight_status')
+
+	if(flight_status == 'delayed'):
+		statusQuery = 'UPDATE flight SET status = \'on-time\' WHERE airline_name = %s and flight_number = %s and departure_datetime = %s;'
+	else:
+		statusQuery = 'UPDATE flight SET status = \'delayed\' WHERE airline_name = %s and flight_number = %s and departure_datetime = %s;'
+
+
+	cursor = conn.cursor()
+	cursor.execute(statusQuery, (airline_name, flight_number, departure_datetime,))
+	cursor.close()
+	if cursor.rowcount == 1:
+		print('updated status')
+		conn.commit()
+	else:
+		print('unable to update')
+		conn.rollback()
+
+	return redirect(url_for('dashboardStaff'))
+
+
 @app.route('/flightStaff')
 def flightStaff():
 	if session.get('user_type') != 'staff':
@@ -293,10 +325,16 @@ def flightStaff():
 
 		cursor = conn.cursor()
 		cursor.execute('SELECT AVG(rating) FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;', (airline_name, flight_number, departure_datetime,))
-		average_rating = cursor.fetchone()
+		average_rating = cursor.fetchone()['AVG(rating)']
+		cursor.close()
+
+		statusQuery = 'SELECT status FROM flight WHERE airline_name = %s and flight_number = %s and departure_datetime = %s; '
+		cursor = conn.cursor()
+		cursor.execute(statusQuery, (airline_name, flight_number, departure_datetime,))
+		flight_status = cursor.fetchone()['status']
 		cursor.close()
 	
-	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, average_rating=average_rating['AVG(rating)'])
+	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, flight_status=flight_status, average_rating=average_rating)
 
 
 

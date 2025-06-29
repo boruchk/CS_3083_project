@@ -1,0 +1,45 @@
+<html>
+<head>
+	<title>Create Flight</title>
+</head>
+<body>
+<form action="/addFlight" method="POST">
+	<h2>Create Flight</h2>
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+
+	<p><strong>Airline:</strong> {{ airline }}</p>
+	<input type="text" name = "flight_number" placeholder="Flight Number" required/> </br>
+
+
+	<select name="departure_airport" id="departure_airport" required>
+	{% for airport in departureAirports %}
+		<option value="{{ airport.name }}">{{ airport.name }}</option>
+	{% endfor %}
+	</select>
+	<input type="datetime-local" name = "departure_datetime" required/> </br>
+
+
+	<select name="arrival_airport" id="arrival_airport" required>
+	{% for airport in arrivalAirports %}
+		<option value="{{ airport.name }}">{{ airport.name }}</option>
+	{% endfor %}
+	</select>
+	<input type="datetime-local" name = "arrival_datetime" required/> </br>
+
+
+	<input type="text" name = "base_price" placeholder="Base Price" required/> </br>
+
+	
+	<input type="text" name = "airplane_id" placeholder="Airplane ID" required/> </br>
+
+
+	<input type="text" name = "remaining_seats" placeholder="Seats" required/> </br>
+
+
+	</br><input type="submit" value = Create Flight />
+</form>
+<a href="/dashboardStaff">Go back</a>
+</body>
+</html>

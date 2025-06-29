@@ -14,7 +14,7 @@
 		{% if workFlights %}
 			<div class="results">
 				<div class="center-content">
-					<h2 class="title" >Flights in the next 30 days:</h2>
+					<h2 class="title" >All {{ airline_name }} flights in the next 30 days:</h2>
 				</div>
 				<table>
 					<tr>
@@ -46,6 +46,95 @@
 				</table>
 			</div>
 		{% endif %}
+
+<div>
+
+
+<h4>Search for {{ airline_name }} flights</h4>
+
+<form action="/dashboardStaff" method="GET">
+				<label for="departureDate">Departure Date:</label>
+				<input type="date" name="departureDate" required> <br><br>
+
+
+				<label for="departureCities">Choose a departure city:</label>
+				<select name="departureCities" id="departureCities" required>
+					{% for city in departureCities %}
+						<option value="{{ city.city }}">{{ city.city }}</option>
+					{% endfor %}
+				</select><br><br>
+
+				<label for="departureAirports">Choose a departure airport:</label>
+				<select name="departureAirports" id="departureAirports" required>
+					{% for airport in departureAirports %}
+						<option value="{{ airport.name }}">{{ airport.name }}</option>
+					{% endfor %}
+				</select><br><br>
+				
+
+				<label for="arrivalCities">Choose an arrival city:</label>
+				<select name="arrivalCities" id="arrivalCities" required>
+					{% for city in arrivalCities %}
+						<option value="{{ city.city }}">{{ city.city }}</option>
+					{% endfor %}
+				</select><br><br>
+
+				<label for="arrivalAirports">Choose an arrival airport:</label>
+				<select name="arrivalAirports" id="arrivalAirports" required>
+					{% for airport in arrivalAirports %}
+						<option value="{{ airport.name }}">{{ airport.name }}</option>
+					{% endfor %}
+				</select><br><br>
+
+				<input type="submit" value="Search Flights"> </br>
+			</form>
+
+
+</div>
+
+
+
+
+<div>
+			{% if searchedFlightsError %}
+				<p class="error"> {{ searchedFlightsError }} </p>
+			{% endif %}
+			{% if searchedFlights %}
+				<h2>Searched flights:</h2>
+			<div class="results">
+
+				<table>
+					<tr>
+						<th>Airline</th>
+						<th>Flight Number</th>
+						<th>Departure Datetime</th>
+						<th>Departure Airport</th>
+						<th>Arrival Datetime</th>
+						<th>Arrival Airport</th>
+						<th>Base Price</th>
+						<th>Airplane ID</th>
+						<th>Remaining Seats</th>
+						<th>Status</th>
+					</tr>
+					{% for flight in searchedFlights %}
+						<tr onclick="location.href='/flightStaff?airline_name={{flight.airline_name}}&flight_number={{ flight.flight_number }}&departure_datetime={{flight.departure_datetime}}'" style="cursor: pointer;">
+							<td>{{ flight.airline_name }}</td>
+							<td>{{ flight.flight_number }}</td>
+							<td>{{ flight.departure_datetime }}</td>
+							<td>{{ flight.departure_airport_name }}</td>
+							<td>{{ flight.arrival_datetime }}</td>
+							<td>{{ flight.arrival_airport_name }}</td>
+							<td>{{ flight.base_price }}</td>
+							<td>{{ flight.airplane_id }}</td>
+							<td>{{ flight.remaining_seats }}</td>
+							<td>{{ flight.status }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			{% endif %}
+
+</div>
 
 		<div class="bottom-links">
 			<a href="/logout">Logout</a>

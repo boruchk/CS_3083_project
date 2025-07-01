@@ -3,7 +3,7 @@
 To start the app, run
 
 ``` cmd
-python flaskr\init.py 
+python flaskr/init.py 
 ```
 
 ## Notes

@@ -94,10 +94,3 @@ CREATE TABLE Ticket(
   FOREIGN KEY (airline_name, flight_number, departure_datetime)
     REFERENCES Flight(airline_name, flight_number, departure_datetime)
 );
-
-CREATE TABLE blog(
-	blog_post varchar(500),
-	username varchar(50),
-	ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-	FOREIGN KEY (username) REFERENCES user(username)
-);

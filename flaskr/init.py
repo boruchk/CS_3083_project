@@ -308,7 +308,8 @@ def flightStaff():
 	flight_number = request.args.get('flight_number')
 	departure_datetime = request.args.get('departure_datetime')
 
-	average_rating = 0
+	average_rating = None
+	flight_status = None
 
 	if user:
 		customersQuery = 'SELECT * FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;'; 
@@ -319,14 +320,18 @@ def flightStaff():
 
 		cursor = conn.cursor()
 		cursor.execute('SELECT AVG(rating) FROM customer, ticket WHERE email = customer_email and airline_name = %s and flight_number = %s and departure_datetime = %s;', (airline_name, flight_number, departure_datetime,))
-		average_rating = cursor.fetchone()['AVG(rating)']
 		cursor.close()
+		res = cursor.fetchone()
+		if res:
+			average_rating = res['AVG(rating)']
 
 		statusQuery = 'SELECT status FROM flight WHERE airline_name = %s and flight_number = %s and departure_datetime = %s; '
 		cursor = conn.cursor()
 		cursor.execute(statusQuery, (airline_name, flight_number, departure_datetime,))
-		flight_status = cursor.fetchone()['status']
+		res = cursor.fetchone()
 		cursor.close()
+		if res:
+			flight_status = res['status']
 	
 	return render_template('flightStaff.html', airline_name=airline_name, flight_number=flight_number, departure_datetime=departure_datetime, customers=customers, flight_status=flight_status, average_rating=average_rating)
 
